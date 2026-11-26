@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Which Card? — best credit card for a purchase</title>
+<style>
+  :root{
+    --bg:#f6f4ef; --panel:#fffdf8; --ink:#1d1b18; --muted:#6b665d; --line:#e3ded3;
+    --accent:#1f5f4a; --accent-ink:#fff; --accent-soft:#e3efe9; --warn:#9a5b13; --warn-soft:#fbf0e1;
+    --bad:#9b2c2c; --radius:12px;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#151513; --panel:#1d1d1a; --ink:#ece8df; --muted:#a19b8f; --line:#33322d;
+      --accent:#5fb393; --accent-ink:#0f1a15; --accent-soft:#1f2e28; --warn:#e0a45a; --warn-soft:#2e2619; --bad:#e07a7a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans)}
+  header{padding:28px 20px 8px;max-width:980px;margin:0 auto;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  header h1{font-family:var(--serif);font-weight:600;font-size:30px;margin:0;letter-spacing:-.01em}
+  header p{margin:0;color:var(--muted)}
+  main{max-width:980px;margin:0 auto;padding:12px 20px 60px;display:grid;grid-template-columns:300px 1fr;gap:20px}
+  @media (max-width:820px){main{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px;font-weight:600}
+  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+  input,textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+  textarea{resize:vertical;min-height:54px}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+  button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+  button:hover{border-color:var(--muted)}
+  button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+  button.primary:disabled{opacity:.55;cursor:progress}
+  button.link{border:none;background:none;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .stack>*+*{margin-top:20px}
+  .cards{list-style:none;margin:0;padding:0}
+  .cards li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:var(--bg)}
+  .cards .name{font-weight:600}
+  .cards .note{font-size:13px;color:var(--muted);white-space:pre-wrap}
+  .cards .acts{float:right;display:flex;gap:6px}
+  .cards .acts button{padding:1px 7px;font-size:12px}
+  .small{font-size:13px;color:var(--muted)}
+  .status{font-size:13px;color:var(--muted);min-height:1.3em;margin-top:8px}
+  .status.err{color:var(--bad)}
+  .pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .pill.warn{background:var(--warn-soft);color:var(--warn)}
+  /* results */
+  .verdict{border:2px solid var(--accent);border-radius:var(--radius);padding:18px;background:var(--accent-soft)}
+  .verdict .k{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700}
+  .verdict .card{font-family:var(--serif);font-size:28px;font-weight:600;margin:2px 0 4px}
+  .verdict .ret{font-size:15px;font-weight:600}
+  .product{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .product .pname{font-weight:600;font-size:17px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+  td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr.best td{background:var(--accent-soft)}
+  h3{font-family:var(--serif);font-size:19px;margin:22px 0 8px;font-weight:600}
+  ul.clean{margin:0;padding-left:20px} ul.clean li{margin:4px 0}
+  .opt{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  .opt b{display:block}
+  .sources a{color:var(--muted);font-size:13px;word-break:break-all}
+  .empty{color:var(--muted);text-align:center;padding:50px 20px}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hist li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .hist li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  details summary{cursor:pointer;color:var(--muted);font-size:13px}
+  dialog{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);color:var(--ink);max-width:460px;width:92%}
+  dialog::backdrop{background:rgba(0,0,0,.35)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Which Card?</h1>
+  <p>Paste a product link. Get the best card from your wallet — and why.</p>
+</header>
+
+<main>
+  <!-- LEFT: wallet + settings -->
+  <aside class="stack">
+    <section class="panel">
+      <h2>My cards</h2>
+      <ul class="cards" id="cardList"></ul>
+      <form id="cardForm">
+        <label for="cardName">Card name</label>
+        <input id="cardName" placeholder="e.g. Chase Sapphire Preferred" required>
+        <label for="cardNote">Notes <span class="small">(optional)</span></label>
+        <textarea id="cardNote" placeholder="e.g. Q4 5% category activated; I value points at 1.5¢"></textarea>
+        <div class="row" style="margin-top:10px"><button class="primary" type="submit" id="cardSubmit">Add card</button><button type="button" class="link" id="cardCancel" hidden>Cancel edit</button></div>
+      </form>
+      <div class="row" style="margin-top:14px">
+        <button id="saveFile" type="button">Save to file</button>
+        <button id="openFile" type="button">Open file</button>
+        <input type="file" id="fileInput" accept=".json,application/json" hidden>
+      </div>
+      <div class="status" id="walletStatus"></div>
+      <p class="small">Only card <em>names</em> and your notes are stored — never card numbers.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Settings</h2>
+      <label for="apiKey">Anthropic API key</label>
+      <input id="apiKey" type="password" placeholder="sk-ant-…" autocomplete="off">
+      <label for="model">Model</label>
+      <select id="model">
+        <option value="claude-sonnet-5-5">Claude Sonnet 5.5 (balanced)</option>
+        <option value="claude-opus-5-5">Claude Opus 5.5 (most thorough)</option>
+        <option value="claude-haiku-5-5">Claude Haiku 5.5 (fastest, cheapest)</option>
+      </select>
+      <label class="row" style="color:var(--ink);margin-top:12px"><input type="checkbox" id="remember" style="width:auto"> Remember key on this device</label>
+      <p class="small">The key goes straight from your browser to Anthropic. It's never in the saved card file or on GitHub.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Recent</h2>
+      <ul class="hist cards" id="history" style="list-style:none;padding:0;margin:0"></ul>
+      <button class="link" id="clearHist" type="button">Clear history</button>
+    </section>
+  </aside>
+
+  <!-- RIGHT: analyze + results -->
+  <section class="stack">
+    <form class="panel" id="askForm">
+      <h2>What are you buying?</h2>
+      <label for="url">Product link</label>
+      <input id="url" type="url" placeholder="https://www.example.com/product/…" required>
+      <div class="row" style="gap:12px">
+        <div style="flex:1;min-width:140px"><label for="price">Price <span class="small">(optional)</span></label><input id="price" placeholder="$249"></div>
+        <div style="flex:2;min-width:200px"><label for="ctx">Anything else? <span class="small">(optional)</span></label><input id="ctx" placeholder="buying in store, gift, want extended warranty…"></div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="primary" id="go" type="submit">Find the best card</button>
+        <span class="status" id="askStatus" style="margin:0"></span>
+      </div>
+    </form>
+
+    <div id="result" class="panel"><div class="empty">Add your cards, paste a product link, and the recommendation shows up here.<br><br>The research checks each card's <em>current</em> earn rates, rotating categories, purchase protection, extended warranty and return protection — then explains the tradeoffs.</div></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const LS = { wallet:'wc.wallet', key:'wc.apikey', model:'wc.model', hist:'wc.history' };
+  const store = {
+    get(k, d){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch{ return d; } },
+    set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} },
+    del(k){ try{ localStorage.removeItem(k); }catch{} }
+  };
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // ---------- Wallet ----------
+  let wallet = store.get(LS.wallet, []);
+  let fileHandle = null, editing = -1;
+
+  function renderWallet(){
+    const ul = $('#cardList');
+    if(!wallet.length){ ul.innerHTML = '<li class="small" style="background:none;border-style:dashed">No cards yet.</li>'; return; }
+    ul.innerHTML = wallet.map((c,i)=>`<li><div class="acts"><button data-e="${i}" title="Edit">Edit</button><button data-d="${i}" title="Remove">✕</button></div>
+      <div class="name">${esc(c.name)}</div>${c.note?`<div class="note">${esc(c.note)}</div>`:''}</li>`).join('');
+  }
+  function persist(msg){ store.set(LS.wallet, wallet); renderWallet(); if(fileHandle) writeHandle(true); if(msg) status('#walletStatus', msg); }
+  function status(sel, msg, err){ const el=$(sel); el.textContent = msg||''; el.classList.toggle('err', !!err); }
+
+  $('#cardForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = $('#cardName').value.trim(), note = $('#cardNote').value.trim();
+    if(!name) return;
+    if(editing>=0){ wallet[editing] = {name, note}; editing=-1; }
+    else wallet.push({name, note});
+    $('#cardForm').reset(); $('#cardSubmit').textContent='Add card'; $('#cardCancel').hidden=true;
+    persist();
+  });
+  $('#cardCancel').onclick = () => { editing=-1; $('#cardForm').reset(); $('#cardSubmit').textContent='Add card'; $('#cardCancel').hidden=true; };
+  $('#cardList').addEventListener('click', e => {
+    const d = e.target.dataset;
+    if(d.d!=null){ wallet.splice(+d.d,1); persist(); }
+    if(d.e!=null){ editing=+d.e; $('#cardName').value=wallet[editing].name; $('#cardNote').value=wallet[editing].note||''; $('#cardSubmit').textContent='Save card'; $('#cardCancel').hidden=false; $('#cardName').focus(); }
+  });
+
+  const fileBody = () => JSON.stringify({ app:'which-card', version:1, saved:new Date().toISOString(), cards:wallet }, null, 2);
+  async function writeHandle(quiet){
+    try{ const w = await fileHandle.createWritable(); await w.write(fileBody()); await w.close(); if(!quiet) status('#walletStatus', `Saved to ${fileHandle.name}`); else status('#walletStatus', `Auto-saved to ${fileHandle.name}`); }
+    catch(err){ status('#walletStatus', 'Could not write file: '+err.message, true); }
+  }
+  $('#saveFile').onclick = async () => {
+    if(window.showSaveFilePicker){
+      try{
+        fileHandle = fileHandle || await showSaveFilePicker({ suggestedName:'my-cards.json', types:[{description:'Card list', accept:{'application/json':['.json']}}] });
+        await writeHandle(false);
+      }catch(err){ if(err.name!=='AbortError') status('#walletStatus', err.message, true); }
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([fileBody()], {type:'application/json'}));
+      a.download = 'my-cards.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+      status('#walletStatus', 'Downloaded my-cards.json');
+    }
+  };
+  function loadText(txt, name){
+    try{
+      const data = JSON.parse(txt);
+      const cards = Array.isArray(data) ? data : data.cards;
+      if(!Array.isArray(cards)) throw new Error('No "cards" list in file');
+      wallet = cards.map(c => typeof c==='string' ? {name:c, note:''} : {name:String(c.name||'').trim(), note:String(c.note||'')}).filter(c=>c.name);
+      store.set(LS.wallet, wallet); renderWallet(); status('#walletStatus', `Loaded ${wallet.length} card${wallet.length===1?'':'s'} from ${name}`);
+    }catch(err){ status('#walletStatus', 'That file isn’t a card list: '+err.message, true); }
+  }
+  $('#openFile').onclick = async () => {
+    if(window.showOpenFilePicker){
+      try{ [fileHandle] = await showOpenFilePicker({ types:[{description:'Card list', accept:{'application/json':['.json']}}] });
+        const f = await fileHandle.getFile(); loadText(await f.text(), f.name); }
+      catch(err){ if(err.name!=='AbortError') status('#walletStatus', err.message, true); }
+    } else $('#fileInput').click();
+  };
+  $('#fileInput').onchange = async e => { const f = e.target.files[0]; if(f) loadText(await f.text(), f.name); e.target.value=''; };
+
+  // ---------- Settings ----------
+  const savedKey = store.get(LS.key, '');
+  $('#apiKey').value = savedKey; $('#remember').checked = !!savedKey;
+  $('#model').value = store.get(LS.model, 'claude-sonnet-5-5');
+  $('#model').onchange = () => store.set(LS.model, $('#model').value);
+  const syncKey = () => { if($('#remember').checked) store.set(LS.key, $('#apiKey').value.trim()); else store.del(LS.key); };
+  $('#apiKey').addEventListener('change', syncKey); $('#remember').addEventListener('change', syncKey);
+
+  // ---------- History ----------
+  let history = store.get(LS.hist, []);
+  function renderHist(){
+    $('#history').innerHTML = history.length ? history.map((h,i)=>`<li><span title="${esc(h.url)}">${esc(h.result?.product?.name || h.url)}</span><button class="link" data-h="${i}">View</button></li>`).join('') : '<li class="small" style="border:none">Nothing yet.</li>';
+  }
+  $('#history').addEventListener('click', e => { const i = e.target.dataset.h; if(i!=null){ renderResult(history[+i].result, history[+i].sources); window.scrollTo({top:0,behavior:'smooth'}); } });
+  $('#clearHist').onclick = () => { history=[]; store.set(LS.hist, history); renderHist(); };
+
+  // ---------- Claude call ----------
+  const SYSTEM = `You are a meticulous credit-card rewards analyst. The user will give you a product URL and the list of credit cards they hold. Your job: work out which of THEIR cards is best for this specific purchase, and explain the reasoning clearly.
+
+Process:
+1. Identify the product, the merchant (retailer), its price, and how the merchant is likely to code (merchant category: e.g. department store, wholesale club, grocery, online retail, home improvement, electronics, travel, Amazon, etc.). Fetch or search the URL to find this.
+2. For EACH card the user holds, look up its CURRENT benefits with web search (do not rely on memory — earn rates, rotating/quarterly categories, merchant-specific bonuses and exclusions change). Focus on: earn rate for this merchant/category, caps, point value, purchase protection, extended warranty, return protection, price protection, and any card-linked offers that commonly apply to this merchant. Respect the user's own notes about each card (activated categories, how they value points) — they override general assumptions.
+3. Compute an estimated effective return for the purchase price on each card (in dollars and %). State the cents-per-point you assumed.
+4. Consider protections as well as rewards: for an expensive or fragile item, an extended warranty or purchase protection may be worth more than an extra 1%.
+5. Note other ways to stack value: shopping portals, card-linked offers (Amex Offers, Chase Offers), discounted gift cards, store cards, buying from a different retailer, etc.
+
+Be honest about uncertainty: if merchant coding is unclear (e.g. a supermarket that may code as a superstore), say so and give the fallback.
+
+Respond with ONLY a single JSON object (no prose before or after, no markdown fences) matching this shape:
+{
+  "product": {"name": str, "merchant": str, "price": number|null, "currency": "USD", "merchant_category": str, "category_confidence": "high"|"medium"|"low"},
+  "recommendation": {"card": str, "effective_return_pct": number, "effective_return_usd": number|null, "headline": str, "rationale": str},
+  "ranking": [{"card": str, "earn": str, "est_return_pct": number, "est_return_usd": number|null, "protections": str, "notes": str}],
+  "tradeoffs": [str],
+  "options": [{"title": str, "detail": str}],
+  "caveats": [str],
+  "assumptions": [str]
+}
+"ranking" must include every card the user listed, best first. "rationale" should be 2-4 plain-English sentences. Keep each list item to one or two sentences.`;
+
+  async function callClaude(body, key, beta){
+    const headers = {
+      'content-type':'application/json', 'x-api-key':key,
+      'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true'
+    };
+    if(beta) headers['anthropic-beta'] = beta;
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method:'POST', headers, body:JSON.stringify(body) });
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok){ const e = new Error(j?.error?.message || `HTTP ${r.status}`); e.status=r.status; throw e; }
+    return j;
+  }
+
+  async function research(url, price, ctx, key, model, onStep){
+    const cardText = wallet.map((c,i)=>`${i+1}. ${c.name}${c.note?` — my notes: ${c.note}`:''}`).join('\n');
+    const user = `Product URL: ${url}\n${price?`Price (as I see it): ${price}\n`:''}${ctx?`Context: ${ctx}\n`:''}\nMy cards:\n${cardText}\n\nWhich card should I use?`;
+    let tools = [
+      { type:'web_search_20250305', name:'web_search', max_uses:12 },
+      { type:'web_fetch_20250910', name:'web_fetch', max_uses:4 }
+    ];
+    let beta = 'web-fetch-2025-09-10';
+    const messages = [{ role:'user', content:user }];
+    const sources = new Map();
+    let finalText = '';
+    for(let turn=0; turn<5; turn++){
+      let resp;
+      try{
+        resp = await callClaude({ model, max_tokens:8000, system:SYSTEM, tools, messages }, key, beta);
+      }catch(err){
+        // fall back to search-only if the fetch tool isn't available on this account/model
+        if(err.status===400 && /fetch|beta|tool/i.test(err.message) && tools.length>1){
+          tools = tools.slice(0,1); beta = null; turn--; onStep('Retrying with web search only…'); continue;
+        }
+        throw err;
+      }
+      for(const b of resp.content||[]){
+        if(b.type==='server_tool_use' && b.name==='web_search') onStep(`Searching: ${b.input?.query||''}`);
+        if(b.type==='server_tool_use' && b.name==='web_fetch') onStep(`Reading: ${b.input?.url||''}`);
+        if(b.type==='web_search_tool_result' && Array.isArray(b.content)) b.content.forEach(s=>{ if(s.url) sources.set(s.url, s.title||s.url); });
+        if(b.type==='text'){ (b.citations||[]).forEach(c=>{ if(c.url) sources.set(c.url, c.title||c.url); }); }
+      }
+      const text = (resp.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+      if(resp.stop_reason==='pause_turn'){ messages.push({ role:'assistant', content:resp.content }); onStep('Still researching…'); continue; }
+      finalText = text; break;
+    }
+    return { result: parseJSON(finalText), sources:[...sources].slice(0,20).map(([url,title])=>({url,title})) };
+  }
+
+  function parseJSON(t){
+    const fenced = t.match(/```(?:json)?\s*([\s\S]*?)```/);
+    let s = fenced ? fenced[1] : t;
+    const a = s.indexOf('{'), b = s.lastIndexOf('}');
+    if(a<0||b<0) throw new Error('The model didn’t return a structured answer. Try again.');
+    return JSON.parse(s.slice(a,b+1));
+  }
+
+  // ---------- Render ----------
+  const money = n => (n==null||isNaN(n)) ? '—' : '$'+Number(n).toFixed(2);
+  const pct = n => (n==null||isNaN(n)) ? '—' : Number(n).toFixed(1)+'%';
+  function renderResult(r, sources){
+    const p = r.product||{}, rec = r.recommendation||{};
+    const conf = p.category_confidence;
+    $('#result').innerHTML = `
+      <div class="product"><div><div class="pname">${esc(p.name||'Product')}</div>
+        <div class="small">${esc(p.merchant||'')}${p.merchant_category?` · codes as <b>${esc(p.merchant_category)}</b>`:''} ${conf?`<span class="pill ${conf==='high'?'':'warn'}">${esc(conf)} confidence</span>`:''}</div></div>
+        <div style="font-size:20px;font-weight:600">${p.price!=null?money(p.price):''}</div></div>
+      <div class="verdict"><div class="k">Use this card</div><div class="card">${esc(rec.card)}</div>
+        <div class="ret">${pct(rec.effective_return_pct)} back${rec.effective_return_usd!=null?` ≈ ${money(rec.effective_return_usd)}`:''}${rec.headline?` — ${esc(rec.headline)}`:''}</div>
+        <p style="margin:10px 0 0">${esc(rec.rationale)}</p></div>
+      ${(r.ranking||[]).length?`<h3>How your cards compare</h3><div style="overflow-x:auto"><table><thead><tr><th>Card</th><th>Earns</th><th>Return</th><th>Protections</th></tr></thead><tbody>
+        ${r.ranking.map((c,i)=>`<tr class="${i===0?'best':''}"><td><b>${esc(c.card)}</b>${c.notes?`<div class="small">${esc(c.notes)}</div>`:''}</td><td>${esc(c.earn)}</td><td class="num">${pct(c.est_return_pct)}<div class="small">${money(c.est_return_usd)}</div></td><td class="small">${esc(c.protections)}</td></tr>`).join('')}
+      </tbody></table></div>`:''}
+      ${list('Tradeoffs', r.tradeoffs)}
+      ${(r.options||[]).length?`<h3>Ways to get more</h3>${r.options.map(o=>`<div class="opt"><b>${esc(o.title)}</b><span class="small">${esc(o.detail)}</span></div>`).join('')}`:''}
+      ${list('Watch out for', r.caveats)}
+      ${(r.assumptions||[]).length?`<details style="margin-top:16px"><summary>Assumptions</summary><ul class="clean small">${r.assumptions.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></details>`:''}
+      ${(sources||[]).length?`<details class="sources" style="margin-top:10px"><summary>Sources (${sources.length})</summary><ul class="clean">${sources.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></details>`:''}
+      <p class="small" style="margin-top:16px">Estimates from current public info; card terms change. Not financial advice.</p>`;
+  }
+  const list = (t, a) => (a||[]).length ? `<h3>${t}</h3><ul class="clean">${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : '';
+
+  $('#askForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const key = $('#apiKey').value.trim(), url = $('#url').value.trim();
+    if(!wallet.length) return status('#askStatus', 'Add at least one card first.', true);
+    if(!key) { status('#askStatus', 'Add your Anthropic API key in Settings.', true); $('#apiKey').focus(); return; }
+    syncKey();
+    $('#go').disabled = true;
+    $('#result').innerHTML = `<div class="empty"><span class="spinner"></span><span id="step">Researching the product and your cards…</span><div class="small" style="margin-top:8px">Usually 30–90 seconds.</div></div>`;
+    status('#askStatus','');
+    try{
+      const { result, sources } = await research(url, $('#price').value.trim(), $('#ctx').value.trim(), key, $('#model').value,
+        m => { const s=$('#step'); if(s) s.textContent = m.length>110 ? m.slice(0,107)+'…' : m; });
+      renderResult(result, sources);
+      history.unshift({ url, at:Date.now(), result, sources }); history = history.slice(0,15);
+      store.set(LS.hist, history); renderHist();
+    }catch(err){
+      const hint = err.status===401 ? ' Check your API key.' : err.status===429 ? ' Rate limited — wait a moment and retry.' : '';
+      $('#result').innerHTML = `<div class="empty" style="color:var(--bad)">Couldn’t finish: ${esc(err.message)}.${hint}</div>`;
+    }finally{ $('#go').disabled = false; }
+  });
+
+  renderWallet(); renderHist();
+})();
+</script>
+</body>
+</html>
