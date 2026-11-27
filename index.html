@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Which Card? — best credit card for a purchase</title>
+<title>Which Card? — best card and portal for a purchase</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='2' y='7' width='28' height='18' rx='3' fill='%231f5f4a'/><rect x='2' y='11' width='28' height='3' fill='%23e3efe9'/></svg>">
 <style>
   :root{
     --bg:#f6f4ef; --panel:#fffdf8; --ink:#1d1b18; --muted:#6b665d; --line:#e3ded3;
     --accent:#1f5f4a; --accent-ink:#fff; --accent-soft:#e3efe9; --warn:#9a5b13; --warn-soft:#fbf0e1;
     --bad:#9b2c2c; --radius:12px;
-    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   }
@@ -19,10 +19,10 @@
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans)}
-  header{padding:28px 20px 8px;max-width:980px;margin:0 auto;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  header{padding:28px 20px 8px;max-width:1000px;margin:0 auto;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
   header h1{font-family:var(--serif);font-weight:600;font-size:30px;margin:0;letter-spacing:-.01em}
   header p{margin:0;color:var(--muted)}
-  main{max-width:980px;margin:0 auto;padding:12px 20px 60px;display:grid;grid-template-columns:300px 1fr;gap:20px}
+  main{max-width:1000px;margin:0 auto;padding:12px 20px 60px;display:grid;grid-template-columns:300px 1fr;gap:20px}
   @media (max-width:820px){main{grid-template-columns:1fr}}
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
   .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 12px;font-weight:600}
@@ -33,26 +33,32 @@
   button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
   button:hover{border-color:var(--muted)}
   button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
-  button.primary:disabled{opacity:.55;cursor:progress}
+  button:disabled{opacity:.55;cursor:progress}
   button.link{border:none;background:none;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .stack>*+*{margin-top:20px}
-  .cards{list-style:none;margin:0;padding:0}
-  .cards li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:var(--bg)}
-  .cards .name{font-weight:600}
-  .cards .note{font-size:13px;color:var(--muted);white-space:pre-wrap}
-  .cards .acts{float:right;display:flex;gap:6px}
-  .cards .acts button{padding:1px 7px;font-size:12px}
+  .items{list-style:none;margin:0;padding:0}
+  .items li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:var(--bg)}
+  .items .name{font-weight:600}
+  .items .note{font-size:13px;color:var(--muted);white-space:pre-wrap}
+  .items .acts{float:right;display:flex;gap:6px}
+  .items .acts button{padding:1px 7px;font-size:12px}
+  .items li.none{background:none;border-style:dashed;color:var(--muted);font-size:13px}
   .small{font-size:13px;color:var(--muted)}
   .status{font-size:13px;color:var(--muted);min-height:1.3em;margin-top:8px}
   .status.err{color:var(--bad)}
   .pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:600}
   .pill.warn{background:var(--warn-soft);color:var(--warn)}
+  .tabs{display:flex;gap:4px;margin-bottom:12px}
+  .tabs button{flex:1;padding:6px;font-size:13px;font-weight:600;color:var(--muted)}
+  .tabs button[aria-selected="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
   /* results */
   .verdict{border:2px solid var(--accent);border-radius:var(--radius);padding:18px;background:var(--accent-soft)}
   .verdict .k{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700}
-  .verdict .card{font-family:var(--serif);font-size:28px;font-weight:600;margin:2px 0 4px}
+  .verdict .card{font-family:var(--serif);font-size:26px;font-weight:600;margin:2px 0 4px;line-height:1.25}
+  .verdict .plus{color:var(--accent);font-weight:400;padding:0 4px}
   .verdict .ret{font-size:15px;font-weight:600}
+  .verdict ol{margin:10px 0 0;padding-left:20px}
   .product{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
   .product .pname{font-weight:600;font-size:17px}
   table{width:100%;border-collapse:collapse;font-size:14px}
@@ -69,30 +75,43 @@
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
   @keyframes spin{to{transform:rotate(360deg)}}
   .hist li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
-  .hist li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hist li>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   details summary{cursor:pointer;color:var(--muted);font-size:13px}
-  dialog{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);color:var(--ink);max-width:460px;width:92%}
-  dialog::backdrop{background:rgba(0,0,0,.35)}
+  /* chat */
+  #chat{margin-top:26px;border-top:1px solid var(--line);padding-top:6px}
+  .msg{margin:10px 0;padding:10px 12px;border-radius:10px;max-width:92%}
+  .msg.q{background:var(--accent);color:var(--accent-ink);margin-left:auto;white-space:pre-wrap}
+  .msg.a{background:var(--bg);border:1px solid var(--line)}
+  .msg.a p{margin:0 0 8px} .msg.a p:last-child{margin:0}
+  .msg.a ul{margin:4px 0 8px;padding-left:20px}
+  .msg.a a{color:var(--accent)}
+  .msg .meta{font-size:12px;color:var(--muted);margin-top:6px}
+  .chatbox{display:flex;gap:8px;align-items:flex-end;margin-top:10px}
+  .chatbox textarea{min-height:44px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .chips button{font-size:12px;padding:3px 9px;border-radius:999px}
 </style>
 </head>
 <body>
 <header>
   <h1>Which Card?</h1>
-  <p>Paste a product link. Get the best card from your wallet — and why.</p>
+  <p>Paste a product link. Get the best card and shopping portal you have — and why.</p>
 </header>
 
 <main>
-  <!-- LEFT: wallet + settings -->
   <aside class="stack">
     <section class="panel">
-      <h2>My cards</h2>
-      <ul class="cards" id="cardList"></ul>
-      <form id="cardForm">
-        <label for="cardName">Card name</label>
-        <input id="cardName" placeholder="e.g. Chase Sapphire Preferred" required>
-        <label for="cardNote">Notes <span class="small">(optional)</span></label>
-        <textarea id="cardNote" placeholder="e.g. Q4 5% category activated; I value points at 1.5¢"></textarea>
-        <div class="row" style="margin-top:10px"><button class="primary" type="submit" id="cardSubmit">Add card</button><button type="button" class="link" id="cardCancel" hidden>Cancel edit</button></div>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="cards" aria-selected="true">My cards</button>
+        <button type="button" role="tab" data-tab="portals" aria-selected="false">My portals</button>
+      </div>
+      <ul class="items" id="itemList"></ul>
+      <form id="itemForm">
+        <label for="itemName" id="itemNameLabel">Card name</label>
+        <input id="itemName" required>
+        <label for="itemNote">Notes <span class="small">(optional)</span></label>
+        <textarea id="itemNote"></textarea>
+        <div class="row" style="margin-top:10px"><button class="primary" type="submit" id="itemSubmit">Add card</button><button type="button" class="link" id="itemCancel" hidden>Cancel edit</button></div>
       </form>
       <div class="row" style="margin-top:14px">
         <button id="saveFile" type="button">Save to file</button>
@@ -100,7 +119,7 @@
         <input type="file" id="fileInput" accept=".json,application/json" hidden>
       </div>
       <div class="status" id="walletStatus"></div>
-      <p class="small">Only card <em>names</em> and your notes are stored — never card numbers.</p>
+      <p class="small">The file holds your card and portal <em>names</em> and notes — never card numbers.</p>
     </section>
 
     <section class="panel">
@@ -114,17 +133,16 @@
         <option value="claude-haiku-5-5">Claude Haiku 5.5 (fastest, cheapest)</option>
       </select>
       <label class="row" style="color:var(--ink);margin-top:12px"><input type="checkbox" id="remember" style="width:auto"> Remember key on this device</label>
-      <p class="small">The key goes straight from your browser to Anthropic. It's never in the saved card file or on GitHub.</p>
+      <p class="small">The key goes straight from your browser to Anthropic. It's never in the saved file or on GitHub.</p>
     </section>
 
     <section class="panel">
       <h2>Recent</h2>
-      <ul class="hist cards" id="history" style="list-style:none;padding:0;margin:0"></ul>
+      <ul class="hist" id="history" style="list-style:none;padding:0;margin:0"></ul>
       <button class="link" id="clearHist" type="button">Clear history</button>
     </section>
   </aside>
 
-  <!-- RIGHT: analyze + results -->
   <section class="stack">
     <form class="panel" id="askForm">
       <h2>What are you buying?</h2>
@@ -135,66 +153,76 @@
         <div style="flex:2;min-width:200px"><label for="ctx">Anything else? <span class="small">(optional)</span></label><input id="ctx" placeholder="buying in store, gift, want extended warranty…"></div>
       </div>
       <div class="row" style="margin-top:14px">
-        <button class="primary" id="go" type="submit">Find the best card</button>
+        <button class="primary" id="go" type="submit">Find the best way to pay</button>
         <span class="status" id="askStatus" style="margin:0"></span>
       </div>
     </form>
 
-    <div id="result" class="panel"><div class="empty">Add your cards, paste a product link, and the recommendation shows up here.<br><br>The research checks each card's <em>current</em> earn rates, rotating categories, purchase protection, extended warranty and return protection — then explains the tradeoffs.</div></div>
+    <div id="result" class="panel"><div class="empty">Add your cards and shopping portals, paste a product link, and the recommendation shows up here.<br><br>It checks each card's <em>current</em> earn rates and protections, compares portal rates for the store, and pairs the best portal with the right card — then explains the tradeoffs. You can ask follow-up questions underneath.</div></div>
   </section>
 </main>
 
 <script>
 (() => {
   const $ = s => document.querySelector(s);
-  const LS = { wallet:'wc.wallet', key:'wc.apikey', model:'wc.model', hist:'wc.history' };
+  const LS = { cards:'wc.wallet', portals:'wc.portals', key:'wc.apikey', model:'wc.model', hist:'wc.history' };
   const store = {
     get(k, d){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch{ return d; } },
     set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} },
     del(k){ try{ localStorage.removeItem(k); }catch{} }
   };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-  // ---------- Wallet ----------
-  let wallet = store.get(LS.wallet, []);
-  let fileHandle = null, editing = -1;
-
-  function renderWallet(){
-    const ul = $('#cardList');
-    if(!wallet.length){ ul.innerHTML = '<li class="small" style="background:none;border-style:dashed">No cards yet.</li>'; return; }
-    ul.innerHTML = wallet.map((c,i)=>`<li><div class="acts"><button data-e="${i}" title="Edit">Edit</button><button data-d="${i}" title="Remove">✕</button></div>
-      <div class="name">${esc(c.name)}</div>${c.note?`<div class="note">${esc(c.note)}</div>`:''}</li>`).join('');
-  }
-  function persist(msg){ store.set(LS.wallet, wallet); renderWallet(); if(fileHandle) writeHandle(true); if(msg) status('#walletStatus', msg); }
   function status(sel, msg, err){ const el=$(sel); el.textContent = msg||''; el.classList.toggle('err', !!err); }
 
-  $('#cardForm').addEventListener('submit', e => {
+  // ---------- Cards & portals ----------
+  const data = { cards: store.get(LS.cards, []), portals: store.get(LS.portals, []) };
+  const KIND = {
+    cards:   { one:'card',   label:'Card name',   ph:'e.g. Chase Sapphire Preferred', notePh:'e.g. Q4 5% category activated; I value points at 1.5¢', none:'No cards yet.' },
+    portals: { one:'portal', label:'Portal name', ph:'e.g. Rakuten', notePh:'e.g. set to earn Amex points; Capital One Shopping extension installed', none:'No portals yet. Try Rakuten, Capital One Shopping, Chase Shop through Chase, TopCashback, an airline portal…' }
+  };
+  let tab = 'cards', editing = -1, fileHandle = null;
+
+  function setTab(t){
+    tab = t; editing = -1;
+    document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab===t));
+    const k = KIND[t];
+    $('#itemNameLabel').textContent = k.label; $('#itemName').placeholder = k.ph; $('#itemNote').placeholder = k.notePh;
+    resetForm(); renderItems();
+  }
+  function resetForm(){ editing=-1; $('#itemForm').reset(); $('#itemSubmit').textContent = 'Add '+KIND[tab].one; $('#itemCancel').hidden = true; }
+  function renderItems(){
+    const list = data[tab];
+    $('#itemList').innerHTML = list.length ? list.map((c,i)=>`<li><div class="acts"><button data-e="${i}">Edit</button><button data-d="${i}" title="Remove">✕</button></div>
+      <div class="name">${esc(c.name)}</div>${c.note?`<div class="note">${esc(c.note)}</div>`:''}</li>`).join('') : `<li class="none">${KIND[tab].none}</li>`;
+    document.querySelector('[data-tab="cards"]').textContent = `My cards${data.cards.length?` (${data.cards.length})`:''}`;
+    document.querySelector('[data-tab="portals"]').textContent = `My portals${data.portals.length?` (${data.portals.length})`:''}`;
+  }
+  function persist(){ store.set(LS.cards, data.cards); store.set(LS.portals, data.portals); renderItems(); if(fileHandle) writeHandle(true); }
+
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+  $('#itemForm').addEventListener('submit', e => {
     e.preventDefault();
-    const name = $('#cardName').value.trim(), note = $('#cardNote').value.trim();
+    const name = $('#itemName').value.trim(), note = $('#itemNote').value.trim();
     if(!name) return;
-    if(editing>=0){ wallet[editing] = {name, note}; editing=-1; }
-    else wallet.push({name, note});
-    $('#cardForm').reset(); $('#cardSubmit').textContent='Add card'; $('#cardCancel').hidden=true;
-    persist();
+    if(editing>=0) data[tab][editing] = {name, note}; else data[tab].push({name, note});
+    resetForm(); persist();
   });
-  $('#cardCancel').onclick = () => { editing=-1; $('#cardForm').reset(); $('#cardSubmit').textContent='Add card'; $('#cardCancel').hidden=true; };
-  $('#cardList').addEventListener('click', e => {
+  $('#itemCancel').onclick = resetForm;
+  $('#itemList').addEventListener('click', e => {
     const d = e.target.dataset;
-    if(d.d!=null){ wallet.splice(+d.d,1); persist(); }
-    if(d.e!=null){ editing=+d.e; $('#cardName').value=wallet[editing].name; $('#cardNote').value=wallet[editing].note||''; $('#cardSubmit').textContent='Save card'; $('#cardCancel').hidden=false; $('#cardName').focus(); }
+    if(d.d!=null){ data[tab].splice(+d.d,1); persist(); }
+    if(d.e!=null){ editing=+d.e; $('#itemName').value=data[tab][editing].name; $('#itemNote').value=data[tab][editing].note||''; $('#itemSubmit').textContent='Save '+KIND[tab].one; $('#itemCancel').hidden=false; $('#itemName').focus(); }
   });
 
-  const fileBody = () => JSON.stringify({ app:'which-card', version:1, saved:new Date().toISOString(), cards:wallet }, null, 2);
+  const fileBody = () => JSON.stringify({ app:'which-card', version:2, saved:new Date().toISOString(), cards:data.cards, portals:data.portals }, null, 2);
   async function writeHandle(quiet){
-    try{ const w = await fileHandle.createWritable(); await w.write(fileBody()); await w.close(); if(!quiet) status('#walletStatus', `Saved to ${fileHandle.name}`); else status('#walletStatus', `Auto-saved to ${fileHandle.name}`); }
+    try{ const w = await fileHandle.createWritable(); await w.write(fileBody()); await w.close(); status('#walletStatus', `${quiet?'Auto-saved':'Saved'} to ${fileHandle.name}`); }
     catch(err){ status('#walletStatus', 'Could not write file: '+err.message, true); }
   }
   $('#saveFile').onclick = async () => {
     if(window.showSaveFilePicker){
-      try{
-        fileHandle = fileHandle || await showSaveFilePicker({ suggestedName:'my-cards.json', types:[{description:'Card list', accept:{'application/json':['.json']}}] });
-        await writeHandle(false);
-      }catch(err){ if(err.name!=='AbortError') status('#walletStatus', err.message, true); }
+      try{ fileHandle = fileHandle || await showSaveFilePicker({ suggestedName:'my-cards.json', types:[{description:'Cards & portals', accept:{'application/json':['.json']}}] }); await writeHandle(false); }
+      catch(err){ if(err.name!=='AbortError') status('#walletStatus', err.message, true); }
     } else {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([fileBody()], {type:'application/json'}));
@@ -202,18 +230,20 @@
       status('#walletStatus', 'Downloaded my-cards.json');
     }
   };
+  const clean = arr => (arr||[]).map(c => typeof c==='string' ? {name:c, note:''} : {name:String(c.name||'').trim(), note:String(c.note||'')}).filter(c=>c.name);
   function loadText(txt, name){
     try{
-      const data = JSON.parse(txt);
-      const cards = Array.isArray(data) ? data : data.cards;
+      const j = JSON.parse(txt);
+      const cards = Array.isArray(j) ? j : j.cards;
       if(!Array.isArray(cards)) throw new Error('No "cards" list in file');
-      wallet = cards.map(c => typeof c==='string' ? {name:c, note:''} : {name:String(c.name||'').trim(), note:String(c.note||'')}).filter(c=>c.name);
-      store.set(LS.wallet, wallet); renderWallet(); status('#walletStatus', `Loaded ${wallet.length} card${wallet.length===1?'':'s'} from ${name}`);
+      data.cards = clean(cards); data.portals = clean(j.portals);
+      store.set(LS.cards, data.cards); store.set(LS.portals, data.portals); renderItems();
+      status('#walletStatus', `Loaded ${data.cards.length} card${data.cards.length===1?'':'s'} and ${data.portals.length} portal${data.portals.length===1?'':'s'} from ${name}`);
     }catch(err){ status('#walletStatus', 'That file isn’t a card list: '+err.message, true); }
   }
   $('#openFile').onclick = async () => {
     if(window.showOpenFilePicker){
-      try{ [fileHandle] = await showOpenFilePicker({ types:[{description:'Card list', accept:{'application/json':['.json']}}] });
+      try{ [fileHandle] = await showOpenFilePicker({ types:[{description:'Cards & portals', accept:{'application/json':['.json']}}] });
         const f = await fileHandle.getFile(); loadText(await f.text(), f.name); }
       catch(err){ if(err.name!=='AbortError') status('#walletStatus', err.message, true); }
     } else $('#fileInput').click();
@@ -228,50 +258,6 @@
   const syncKey = () => { if($('#remember').checked) store.set(LS.key, $('#apiKey').value.trim()); else store.del(LS.key); };
   $('#apiKey').addEventListener('change', syncKey); $('#remember').addEventListener('change', syncKey);
 
-  // ---------- History ----------
-  let history = store.get(LS.hist, []);
-  function renderHist(){
-    $('#history').innerHTML = history.length ? history.map((h,i)=>`<li><span title="${esc(h.url)}">${esc(h.result?.product?.name || h.url)}</span><span style="flex:none">${h.cost?`<span class="small">${fmtCost(h.cost.usd)}</span> `:''}<button class="link" data-h="${i}">View</button></span></li>`).join('') + (history.some(h=>h.cost) ? `<li class="small" style="border:none">Total for these: ${fmtCost(history.reduce((s,h)=>s+(h.cost?.usd||0),0))}</li>` : '') : '<li class="small" style="border:none">Nothing yet.</li>';
-  }
-  $('#history').addEventListener('click', e => { const i = e.target.dataset.h; if(i!=null){ renderResult(history[+i].result, history[+i].sources, history[+i].cost); window.scrollTo({top:0,behavior:'smooth'}); } });
-  $('#clearHist').onclick = () => { history=[]; store.set(LS.hist, history); renderHist(); };
-
-  // ---------- Claude call ----------
-  const SYSTEM = `You are a meticulous credit-card rewards analyst. The user will give you a product URL and the list of credit cards they hold. Your job: work out which of THEIR cards is best for this specific purchase, and explain the reasoning clearly.
-
-Process:
-1. Identify the product, the merchant (retailer), its price, and how the merchant is likely to code (merchant category: e.g. department store, wholesale club, grocery, online retail, home improvement, electronics, travel, Amazon, etc.). Fetch or search the URL to find this.
-2. For EACH card the user holds, look up its CURRENT benefits with web search (do not rely on memory — earn rates, rotating/quarterly categories, merchant-specific bonuses and exclusions change). Focus on: earn rate for this merchant/category, caps, point value, purchase protection, extended warranty, return protection, price protection, and any card-linked offers that commonly apply to this merchant. Respect the user's own notes about each card (activated categories, how they value points) — they override general assumptions.
-3. Compute an estimated effective return for the purchase price on each card (in dollars and %). State the cents-per-point you assumed.
-4. Consider protections as well as rewards: for an expensive or fragile item, an extended warranty or purchase protection may be worth more than an extra 1%.
-5. Note other ways to stack value: shopping portals, card-linked offers (Amex Offers, Chase Offers), discounted gift cards, store cards, buying from a different retailer, etc.
-
-Be honest about uncertainty: if merchant coding is unclear (e.g. a supermarket that may code as a superstore), say so and give the fallback.
-
-Respond with ONLY a single JSON object (no prose before or after, no markdown fences) matching this shape:
-{
-  "product": {"name": str, "merchant": str, "price": number|null, "currency": "USD", "merchant_category": str, "category_confidence": "high"|"medium"|"low"},
-  "recommendation": {"card": str, "effective_return_pct": number, "effective_return_usd": number|null, "headline": str, "rationale": str},
-  "ranking": [{"card": str, "earn": str, "est_return_pct": number, "est_return_usd": number|null, "protections": str, "notes": str}],
-  "tradeoffs": [str],
-  "options": [{"title": str, "detail": str}],
-  "caveats": [str],
-  "assumptions": [str]
-}
-"ranking" must include every card the user listed, best first. "rationale" should be 2-4 plain-English sentences. Keep each list item to one or two sentences.`;
-
-  async function callClaude(body, key, beta){
-    const headers = {
-      'content-type':'application/json', 'x-api-key':key,
-      'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true'
-    };
-    if(beta) headers['anthropic-beta'] = beta;
-    const r = await fetch('https://api.anthropic.com/v1/messages', { method:'POST', headers, body:JSON.stringify(body) });
-    const j = await r.json().catch(()=>({}));
-    if(!r.ok){ const e = new Error(j?.error?.message || `HTTP ${r.status}`); e.status=r.status; throw e; }
-    return j;
-  }
-
   // ---------- Cost ----------
   // USD per million tokens (list prices, Nov 2026). Haiku has a higher tier for prompts over 100K tokens.
   const PRICES = {
@@ -280,110 +266,234 @@ Respond with ONLY a single JSON object (no prose before or after, no markdown fe
     'claude-haiku-5-5':  { in:0.10, out:0.50, cw:0.125, cr:0.01, big:{ in:0.50, out:2.50, cw:0.625, cr:0.05 } }
   };
   const SEARCH_COST = 0.01; // $10 per 1,000 searches; web fetch has no extra charge
-  function requestCost(model, u){
-    let p = PRICES[model] || PRICES['claude-sonnet-5-5'];
+  const newCost = model => ({ usd:0, tokens:0, searches:0, fetches:0, model });
+  function addUsage(cost, u){
+    let p = PRICES[cost.model] || PRICES['claude-sonnet-5-5'];
     const prompt = (u.input_tokens||0) + (u.cache_read_input_tokens||0) + (u.cache_creation_input_tokens||0);
     if(p.big && prompt > 100000) p = p.big;
-    const searches = u.server_tool_use?.web_search_requests || 0;
-    return { usd: ((u.input_tokens||0)*p.in + (u.output_tokens||0)*p.out + (u.cache_creation_input_tokens||0)*p.cw + (u.cache_read_input_tokens||0)*p.cr)/1e6 + searches*SEARCH_COST,
-             tokens: prompt + (u.output_tokens||0), searches, fetches: u.server_tool_use?.web_fetch_requests || 0 };
+    const s = u.server_tool_use?.web_search_requests || 0;
+    cost.usd += ((u.input_tokens||0)*p.in + (u.output_tokens||0)*p.out + (u.cache_creation_input_tokens||0)*p.cw + (u.cache_read_input_tokens||0)*p.cr)/1e6 + s*SEARCH_COST;
+    cost.tokens += prompt + (u.output_tokens||0); cost.searches += s; cost.fetches += u.server_tool_use?.web_fetch_requests || 0;
   }
   const fmtCost = n => n==null ? '—' : n < 0.01 ? '<$0.01' : '$'+n.toFixed(n < 1 ? 3 : 2);
+  const modelName = m => ({ 'claude-opus-5-5':'Opus 5.5', 'claude-sonnet-5-5':'Sonnet 5.5', 'claude-haiku-5-5':'Haiku 5.5' }[m] || m);
+  const costLine = c => `${fmtCost(c.usd)} · ${c.tokens.toLocaleString()} tokens · ${c.searches} search${c.searches===1?'':'es'}${c.fetches?` · ${c.fetches} page read${c.fetches===1?'':'s'}`:''} · ${esc(modelName(c.model))}`;
 
-  async function research(url, price, ctx, key, model, onStep){
-    const cost = { usd:0, tokens:0, searches:0, fetches:0, model };
-    const cardText = wallet.map((c,i)=>`${i+1}. ${c.name}${c.note?` — my notes: ${c.note}`:''}`).join('\n');
-    const user = `Product URL: ${url}\n${price?`Price (as I see it): ${price}\n`:''}${ctx?`Context: ${ctx}\n`:''}\nMy cards:\n${cardText}\n\nWhich card should I use?`;
-    let tools = [
-      { type:'web_search_20250305', name:'web_search', max_uses:12 },
-      { type:'web_fetch_20250910', name:'web_fetch', max_uses:4 }
-    ];
-    let beta = 'web-fetch-2025-09-10';
-    const messages = [{ role:'user', content:user }];
-    const sources = new Map();
-    let finalText = '';
-    for(let turn=0; turn<5; turn++){
+  // ---------- Prompts ----------
+  const PLAYBOOK = `Shopping playbook (Chris Hutchins, All the Hacks) — apply where it fits:
+- Always stack: coupon/promo code + shopping portal + card-linked offer (Amex Offers, Chase Offers, Capital One Offers, etc.) + discounted gift card + the right card.
+- Compare portal rates for the merchant on CashBackMonitor (cashbackmonitor.com) rather than assuming. Rakuten is a good default when rates are close because it can pay Amex Membership Rewards points (or Bilt points) instead of cash.
+- Most online retailers don't earn card bonus points, so consider buying a gift card for that retailer somewhere the card does earn a bonus (e.g. grocery or office-supply stores) or from a discounted gift-card seller, then paying with it.
+- Check price history (e.g. Keepa for Amazon) before buying; wait if a sale is likely soon.
+- Ask the retailer's live chat for a discount code — it often works better than coupon sites.`;
+
+  const SYSTEM = `You are a meticulous credit-card rewards and shopping-portal analyst. The user gives you a product URL, the credit cards they hold, and the shopping portals they use. Work out the best way for THEM to pay — which portal (if any) to click through and which of their cards to use — and explain it clearly.
+
+Process:
+1. Identify the product, merchant, price, whether it can be bought online (portals only apply to online/digital purchases unless a portal has a linked in-store offer), and how the merchant likely codes (merchant category). Fetch or search the URL.
+2. For EACH card, look up CURRENT benefits with web search (do not rely on memory): earn rate for this merchant/category, caps, point value, purchase protection, extended warranty, return protection, and card-linked offers that commonly apply. Respect the user's notes about each card — they override general assumptions.
+3. For EACH of the user's portals, find the CURRENT rate at this merchant (check cashbackmonitor.com for a cross-portal comparison, and the portal's own store page if needed). Note how the portal pays (cash, Amex MR, Bilt, airline miles, Capital One miles…) and any card requirement (e.g. Chase Shop through Chase and Capital One Offers require paying with that issuer's card; Rakuten points mode needs a linked Amex MR or Bilt account but you can pay with any card; Capital One Shopping works with any card). Respect the user's notes about each portal. If a portal the user does NOT have pays notably more, mention it as an option.
+4. Pair them: compute the total return of portal + card combinations (portal earnings stack on top of card earnings; only one portal can get credit per purchase — the last click wins). Value points at the user's stated cents-per-point, or a stated conservative assumption. Pick the best combination, weighing protections too (for an expensive or fragile item, extended warranty or purchase protection can outweigh an extra 1%).
+5. Note other stacking opportunities from the playbook below.
+
+${PLAYBOOK}
+
+Be honest about uncertainty: portal rates change daily and merchant coding can be unclear — say so and give the fallback.
+
+Respond with ONLY a single JSON object (no prose before or after, no markdown fences) matching this shape:
+{
+  "product": {"name": str, "merchant": str, "price": number|null, "currency": "USD", "merchant_category": str, "category_confidence": "high"|"medium"|"low", "online": boolean},
+  "best_combo": {"portal": str|null, "card": str, "portal_rate": str|null, "card_earn": str, "total_return_pct": number, "total_return_usd": number|null, "headline": str, "why": str, "steps": [str]},
+  "ranking": [{"card": str, "earn": str, "est_return_pct": number, "est_return_usd": number|null, "protections": str, "notes": str}],
+  "portals": [{"portal": str, "yours": boolean, "rate": str, "pays_in": str, "est_value_usd": number|null, "card_requirement": str, "notes": str}],
+  "tradeoffs": [str],
+  "options": [{"title": str, "detail": str}],
+  "caveats": [str],
+  "assumptions": [str]
+}
+"best_combo.portal" is null if no portal applies or none helps. "steps" is a short ordered how-to (e.g. "Open Rakuten and click through to Best Buy", "Activate the Amex Offer", "Pay with Amex Gold"). "ranking" includes every card the user listed, best first, card-only returns (no portal). "portals" includes every portal the user listed (yours: true) plus at most two better ones they don't have (yours: false), best first. "why" is 2-4 plain-English sentences. Keep each list item to one or two sentences.`;
+
+  const CHAT_SYSTEM = `You are a credit-card rewards and shopping-portal analyst continuing a conversation with the user about a purchase you already analysed (your analysis is the JSON earlier in the conversation). Answer the user's follow-up questions directly and concisely in plain English — short paragraphs or a few bullets, using **bold** sparingly. Do NOT reply in JSON. Use web search if the question needs current facts you don't already have (rates, offers, terms). Respect the user's notes on their cards and portals. If they ask "what if" (different card, portal, store, price), recompute and give the new numbers.
+
+${PLAYBOOK}`;
+
+  // ---------- Claude ----------
+  async function callClaude(body, key, beta){
+    const headers = { 'content-type':'application/json', 'x-api-key':key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' };
+    if(beta) headers['anthropic-beta'] = beta;
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method:'POST', headers, body:JSON.stringify(body) });
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok){ const e = new Error(j?.error?.message || `HTTP ${r.status}`); e.status=r.status; throw e; }
+    return j;
+  }
+
+  // Runs a turn with server tools, following pause_turn. Returns final text, sources and cost.
+  async function runTurn({ key, model, system, messages, searches, fetches, maxTokens, onStep }){
+    let tools = [ { type:'web_search_20250305', name:'web_search', max_uses:searches } ];
+    if(fetches) tools.push({ type:'web_fetch_20250910', name:'web_fetch', max_uses:fetches });
+    let beta = fetches ? 'web-fetch-2025-09-10' : null;
+    const msgs = messages.slice(), sources = new Map(), cost = newCost(model);
+    let text = '';
+    for(let turn=0; turn<6; turn++){
       let resp;
-      try{
-        resp = await callClaude({ model, max_tokens:8000, system:SYSTEM, tools, messages }, key, beta);
-      }catch(err){
-        // fall back to search-only if the fetch tool isn't available on this account/model
-        if(err.status===400 && /fetch|beta|tool/i.test(err.message) && tools.length>1){
-          tools = tools.slice(0,1); beta = null; turn--; onStep('Retrying with web search only…'); continue;
-        }
-        throw err;
+      try{ resp = await callClaude({ model, max_tokens:maxTokens, system, tools, messages:msgs }, key, beta); }
+      catch(err){
+        if(err.status===400 && tools.length>1 && /fetch|beta|tool/i.test(err.message)){ tools = tools.slice(0,1); beta = null; turn--; onStep?.('Retrying with web search only…'); continue; }
+        err.cost = cost; throw err;
       }
-      if(resp.usage){ const c = requestCost(model, resp.usage); cost.usd+=c.usd; cost.tokens+=c.tokens; cost.searches+=c.searches; cost.fetches+=c.fetches; }
+      if(resp.usage) addUsage(cost, resp.usage);
       for(const b of resp.content||[]){
-        if(b.type==='server_tool_use' && b.name==='web_search') onStep(`Searching: ${b.input?.query||''}`);
-        if(b.type==='server_tool_use' && b.name==='web_fetch') onStep(`Reading: ${b.input?.url||''}`);
+        if(b.type==='server_tool_use' && b.name==='web_search') onStep?.(`Searching: ${b.input?.query||''}`);
+        if(b.type==='server_tool_use' && b.name==='web_fetch') onStep?.(`Reading: ${b.input?.url||''}`);
         if(b.type==='web_search_tool_result' && Array.isArray(b.content)) b.content.forEach(s=>{ if(s.url) sources.set(s.url, s.title||s.url); });
-        if(b.type==='text'){ (b.citations||[]).forEach(c=>{ if(c.url) sources.set(c.url, c.title||c.url); }); }
+        if(b.type==='text') (b.citations||[]).forEach(c=>{ if(c.url) sources.set(c.url, c.title||c.url); });
       }
-      const text = (resp.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-      if(resp.stop_reason==='pause_turn'){ messages.push({ role:'assistant', content:resp.content }); onStep('Still researching…'); continue; }
-      finalText = text; break;
+      text = (resp.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+      if(resp.stop_reason==='pause_turn'){ msgs.push({ role:'assistant', content:resp.content }); onStep?.('Still researching…'); continue; }
+      break;
     }
-    let result; try{ result = parseJSON(finalText); }catch(e){ e.cost = cost; throw e; }
-    return { cost, result, sources:[...sources].slice(0,20).map(([url,title])=>({url,title})) };
+    return { text, cost, sources:[...sources].slice(0,25).map(([url,title])=>({url,title})) };
   }
 
   function parseJSON(t){
     const fenced = t.match(/```(?:json)?\s*([\s\S]*?)```/);
-    let s = fenced ? fenced[1] : t;
+    const s = fenced ? fenced[1] : t;
     const a = s.indexOf('{'), b = s.lastIndexOf('}');
-    if(a<0||b<0) throw new Error('The model didn’t return a structured answer. Try again.');
+    if(a<0||b<0) throw new Error('The model didn’t return a structured answer. Try again');
     return JSON.parse(s.slice(a,b+1));
   }
+  const listText = (arr) => arr.map((c,i)=>`${i+1}. ${c.name}${c.note?` — my notes: ${c.note}`:''}`).join('\n');
+
+  // ---------- History ----------
+  let history = store.get(LS.hist, []);
+  let current = -1; // index into history of the analysis on screen
+  function saveHist(){ store.set(LS.hist, history); renderHist(); }
+  function renderHist(){
+    const total = history.reduce((s,h)=>s+(h.cost?.usd||0)+(h.chat||[]).reduce((t,c)=>t+(c.cost?.usd||0),0),0);
+    $('#history').innerHTML = history.length ? history.map((h,i)=>{
+      const c = (h.cost?.usd||0) + (h.chat||[]).reduce((t,x)=>t+(x.cost?.usd||0),0);
+      return `<li><span title="${esc(h.url)}">${esc(h.result?.product?.name || h.url)}</span><span style="flex:none">${h.cost?`<span class="small">${fmtCost(c)}</span> `:''}<button class="link" data-h="${i}">View</button></span></li>`;
+    }).join('') + (total ? `<li class="small" style="border:none">Total for these: ${fmtCost(total)}</li>` : '') : '<li class="small" style="border:none">Nothing yet.</li>';
+  }
+  $('#history').addEventListener('click', e => { const i = e.target.dataset.h; if(i!=null){ current=+i; renderResult(history[current]); window.scrollTo({top:0,behavior:'smooth'}); } });
+  $('#clearHist').onclick = () => { history=[]; current=-1; saveHist(); };
 
   // ---------- Render ----------
   const money = n => (n==null||isNaN(n)) ? '—' : '$'+Number(n).toFixed(2);
   const pct = n => (n==null||isNaN(n)) ? '—' : Number(n).toFixed(1)+'%';
-  function renderResult(r, sources, cost){
-    const p = r.product||{}, rec = r.recommendation||{};
-    const conf = p.category_confidence;
+  const list = (t, a) => (a||[]).length ? `<h3>${t}</h3><ul class="clean">${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : '';
+  function md(s){
+    const lines = esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+      .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>').split('\n');
+    let out = '', inList = false, para = [];
+    const flush = () => { if(para.length){ out += `<p>${para.join('<br>')}</p>`; para=[]; } };
+    for(const l of lines){
+      const m = l.match(/^\s*(?:[-*•]|\d+\.)\s+(.*)/);
+      if(m){ flush(); if(!inList){ out+='<ul>'; inList=true; } out += `<li>${m[1]}</li>`; }
+      else { if(inList){ out+='</ul>'; inList=false; } if(l.trim()) para.push(l.replace(/^#+\s*/,'')); else flush(); }
+    }
+    flush(); if(inList) out+='</ul>';
+    return out;
+  }
+
+  function renderResult(h){
+    const r = h.result, p = r.product||{}, conf = p.category_confidence, old = r.recommendation || {};
+    const bc = r.best_combo || { card:old.card, total_return_pct:old.effective_return_pct, total_return_usd:old.effective_return_usd, headline:old.headline, why:old.rationale };
+    const combo = bc.portal ? `${esc(bc.portal)}<span class="plus">+</span>${esc(bc.card)}` : esc(bc.card);
     $('#result').innerHTML = `
       <div class="product"><div><div class="pname">${esc(p.name||'Product')}</div>
-        <div class="small">${esc(p.merchant||'')}${p.merchant_category?` · codes as <b>${esc(p.merchant_category)}</b>`:''} ${conf?`<span class="pill ${conf==='high'?'':'warn'}">${esc(conf)} confidence</span>`:''}</div></div>
+        <div class="small">${esc(p.merchant||'')}${p.merchant_category?` · codes as <b>${esc(p.merchant_category)}</b>`:''} ${conf?`<span class="pill ${conf==='high'?'':'warn'}">${esc(conf)} confidence</span>`:''} ${p.online===false?'<span class="pill warn">in-store</span>':''}</div></div>
         <div style="font-size:20px;font-weight:600">${p.price!=null?money(p.price):''}</div></div>
-      <div class="verdict"><div class="k">Use this card</div><div class="card">${esc(rec.card)}</div>
-        <div class="ret">${pct(rec.effective_return_pct)} back${rec.effective_return_usd!=null?` ≈ ${money(rec.effective_return_usd)}`:''}${rec.headline?` — ${esc(rec.headline)}`:''}</div>
-        <p style="margin:10px 0 0">${esc(rec.rationale)}</p></div>
-      ${(r.ranking||[]).length?`<h3>How your cards compare</h3><div style="overflow-x:auto"><table><thead><tr><th>Card</th><th>Earns</th><th>Return</th><th>Protections</th></tr></thead><tbody>
+      <div class="verdict"><div class="k">${bc.portal?'Best portal + card':'Use this card'}</div><div class="card">${combo}</div>
+        <div class="ret">${pct(bc.total_return_pct)} back${bc.total_return_usd!=null?` ≈ ${money(bc.total_return_usd)}`:''}${bc.headline?` — ${esc(bc.headline)}`:''}</div>
+        ${bc.portal?`<div class="small" style="margin-top:2px">Portal ${esc(bc.portal_rate||'')} · Card ${esc(bc.card_earn||'')}</div>`:''}
+        <p style="margin:10px 0 0">${esc(bc.why)}</p>
+        ${(bc.steps||[]).length?`<ol>${bc.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`:''}</div>
+      ${(r.portals||[]).length?`<h3>Portals for this store</h3><div style="overflow-x:auto"><table><thead><tr><th>Portal</th><th>Rate</th><th>Pays in</th><th>Card needed</th></tr></thead><tbody>
+        ${r.portals.map((x,i)=>`<tr class="${x.portal===bc.portal?'best':''}"><td><b>${esc(x.portal)}</b> ${x.yours===false?'<span class="pill warn">not in your list</span>':''}${x.notes?`<div class="small">${esc(x.notes)}</div>`:''}</td><td class="num">${esc(x.rate)}${x.est_value_usd!=null?`<div class="small">${money(x.est_value_usd)}</div>`:''}</td><td class="small">${esc(x.pays_in)}</td><td class="small">${esc(x.card_requirement)}</td></tr>`).join('')}
+      </tbody></table></div>`:''}
+      ${(r.ranking||[]).length?`<h3>Your cards on their own</h3><div style="overflow-x:auto"><table><thead><tr><th>Card</th><th>Earns</th><th>Return</th><th>Protections</th></tr></thead><tbody>
         ${r.ranking.map((c,i)=>`<tr class="${i===0?'best':''}"><td><b>${esc(c.card)}</b>${c.notes?`<div class="small">${esc(c.notes)}</div>`:''}</td><td>${esc(c.earn)}</td><td class="num">${pct(c.est_return_pct)}<div class="small">${money(c.est_return_usd)}</div></td><td class="small">${esc(c.protections)}</td></tr>`).join('')}
       </tbody></table></div>`:''}
       ${list('Tradeoffs', r.tradeoffs)}
       ${(r.options||[]).length?`<h3>Ways to get more</h3>${r.options.map(o=>`<div class="opt"><b>${esc(o.title)}</b><span class="small">${esc(o.detail)}</span></div>`).join('')}`:''}
       ${list('Watch out for', r.caveats)}
       ${(r.assumptions||[]).length?`<details style="margin-top:16px"><summary>Assumptions</summary><ul class="clean small">${r.assumptions.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></details>`:''}
-      ${(sources||[]).length?`<details class="sources" style="margin-top:10px"><summary>Sources (${sources.length})</summary><ul class="clean">${sources.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></details>`:''}
-      ${cost?`<p class="small" style="margin-top:16px"><b>This lookup cost about ${fmtCost(cost.usd)}</b> · ${cost.tokens.toLocaleString()} tokens · ${cost.searches} search${cost.searches===1?'':'es'}${cost.fetches?` · ${cost.fetches} page read${cost.fetches===1?'':'s'}`:''} · ${esc((cost.model||'').replace('claude-','').replace(/-(\d)-(\d)$/,' $1.$2'))}</p>`:''}
-      <p class="small" style="margin-top:6px">Estimates from current public info; card terms change. Not financial advice.</p>`;
+      ${(h.sources||[]).length?`<details class="sources" style="margin-top:10px"><summary>Sources (${h.sources.length})</summary><ul class="clean">${h.sources.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></details>`:''}
+      ${h.cost?`<p class="small" style="margin-top:16px"><b>This lookup cost about</b> ${costLine(h.cost)}</p>`:''}
+      <p class="small" style="margin-top:6px">Estimates from current public info; card terms and portal rates change. Not financial advice.</p>
+      <div id="chat">
+        <h3>Ask a follow-up</h3>
+        <div id="thread"></div>
+        ${h.userMsg?`<form class="chatbox" id="chatForm"><textarea id="chatQ" placeholder="e.g. What if I buy it at Costco instead? Is the extended warranty worth more than the extra points?" rows="2"></textarea><button class="primary" id="chatGo" type="submit">Ask</button></form>
+        <div class="chips" id="chips">${['Is it worth waiting for a sale?','Should I buy a discounted gift card first?','What if I pay with my second-best card?','Explain the points value you assumed'].map(c=>`<button type="button">${c}</button>`).join('')}</div>
+        <div class="status" id="chatStatus"></div>`:'<p class="small">Follow-ups are available for lookups made after this feature was added.</p>'}
+      </div>`;
+    renderThread(h);
+    const f = $('#chatForm');
+    if(f){
+      f.addEventListener('submit', e => { e.preventDefault(); askFollowUp(); });
+      $('#chatQ').addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); askFollowUp(); } });
+      $('#chips').addEventListener('click', e => { if(e.target.tagName==='BUTTON'){ $('#chatQ').value = e.target.textContent; askFollowUp(); } });
+    }
   }
-  const list = (t, a) => (a||[]).length ? `<h3>${t}</h3><ul class="clean">${a.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>` : '';
+  function renderThread(h){
+    const t = $('#thread'); if(!t) return;
+    t.innerHTML = (h.chat||[]).map(c=>`<div class="msg q">${esc(c.q)}</div><div class="msg a">${md(c.a)}${(c.sources||[]).length?`<div class="meta">Sources: ${c.sources.slice(0,4).map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>`).join(' · ')}</div>`:''}${c.cost?`<div class="meta">${costLine(c.cost)}</div>`:''}</div>`).join('');
+  }
+
+  // ---------- Actions ----------
+  function needKey(sel){
+    const key = $('#apiKey').value.trim();
+    if(!key){ status(sel, 'Add your Anthropic API key in Settings.', true); $('#apiKey').focus(); return null; }
+    syncKey(); return key;
+  }
 
   $('#askForm').addEventListener('submit', async e => {
     e.preventDefault();
-    const key = $('#apiKey').value.trim(), url = $('#url').value.trim();
-    if(!wallet.length) return status('#askStatus', 'Add at least one card first.', true);
-    if(!key) { status('#askStatus', 'Add your Anthropic API key in Settings.', true); $('#apiKey').focus(); return; }
-    syncKey();
-    $('#go').disabled = true;
-    $('#result').innerHTML = `<div class="empty"><span class="spinner"></span><span id="step">Researching the product and your cards…</span><div class="small" style="margin-top:8px">Usually 30–90 seconds.</div></div>`;
-    status('#askStatus','');
+    if(!data.cards.length) return status('#askStatus', 'Add at least one card first.', true);
+    const key = needKey('#askStatus'); if(!key) return;
+    const url = $('#url').value.trim(), price = $('#price').value.trim(), ctx = $('#ctx').value.trim(), model = $('#model').value;
+    const userMsg = `Product URL: ${url}\n${price?`Price (as I see it): ${price}\n`:''}${ctx?`Context: ${ctx}\n`:''}\nMy cards:\n${listText(data.cards)}\n\nMy shopping portals:\n${data.portals.length?listText(data.portals):'(none listed — suggest one or two if they would clearly help)'}\n\nWhat's the best way to pay?`;
+    $('#go').disabled = true; status('#askStatus','');
+    $('#result').innerHTML = `<div class="empty"><span class="spinner"></span><span id="step">Researching the product, your cards and portal rates…</span><div class="small" style="margin-top:8px">Usually 30–120 seconds.</div></div>`;
     try{
-      const { result, sources, cost } = await research(url, $('#price').value.trim(), $('#ctx').value.trim(), key, $('#model').value,
-        m => { const s=$('#step'); if(s) s.textContent = m.length>110 ? m.slice(0,107)+'…' : m; });
-      renderResult(result, sources, cost);
-      history.unshift({ url, at:Date.now(), result, sources, cost }); history = history.slice(0,15);
-      store.set(LS.hist, history); renderHist();
+      const { text, sources, cost } = await runTurn({ key, model, system:SYSTEM, messages:[{ role:'user', content:userMsg }], searches:15, fetches:5, maxTokens:10000,
+        onStep: m => { const s=$('#step'); if(s) s.textContent = m.length>110 ? m.slice(0,107)+'…' : m; } });
+      let result; try{ result = parseJSON(text); }catch(err){ err.cost = cost; throw err; }
+      const h = { url, at:Date.now(), model, userMsg, raw:JSON.stringify(result), result, sources, cost, chat:[] };
+      history.unshift(h); history = history.slice(0,15); current = 0; saveHist();
+      renderResult(h);
     }catch(err){
       const hint = err.status===401 ? ' Check your API key.' : err.status===429 ? ' Rate limited — wait a moment and retry.' : '';
       $('#result').innerHTML = `<div class="empty" style="color:var(--bad)">Couldn’t finish: ${esc(err.message)}.${hint}${err.cost?`<div class="small">Spent about ${fmtCost(err.cost.usd)} before stopping.</div>`:''}</div>`;
     }finally{ $('#go').disabled = false; }
   });
 
-  renderWallet(); renderHist();
+  async function askFollowUp(){
+    const h = history[current]; const q = $('#chatQ').value.trim();
+    if(!h || !q || $('#chatGo').disabled) return;
+    const key = needKey('#chatStatus'); if(!key) return;
+    const model = $('#model').value;
+    const messages = [{ role:'user', content:h.userMsg }, { role:'assistant', content:h.raw }];
+    (h.chat||[]).forEach(c => { messages.push({ role:'user', content:c.q }, { role:'assistant', content:c.a }); });
+    messages.push({ role:'user', content:`My cards and portals right now (in case they changed):\nCards:\n${listText(data.cards)}\nPortals:\n${data.portals.length?listText(data.portals):'(none)'}\n\nQuestion: ${q}` });
+    $('#chatGo').disabled = true; $('#chatQ').value = '';
+    $('#thread').insertAdjacentHTML('beforeend', `<div class="msg q">${esc(q)}</div><div class="msg a" id="pending"><span class="spinner"></span><span id="cstep">Thinking…</span></div>`);
+    status('#chatStatus','');
+    try{
+      const { text, sources, cost } = await runTurn({ key, model, system:CHAT_SYSTEM, messages, searches:6, fetches:2, maxTokens:3000,
+        onStep: m => { const s=$('#cstep'); if(s) s.textContent = m.length>90 ? m.slice(0,87)+'…' : m; } });
+      h.chat = h.chat || []; h.chat.push({ q, a:text.trim() || '(no answer)', sources, cost });
+      saveHist(); renderThread(h);
+    }catch(err){
+      $('#pending')?.remove();
+      $('#chatQ').value = q;
+      status('#chatStatus', `Couldn’t answer: ${err.message}${err.cost?` (spent about ${fmtCost(err.cost.usd)})`:''}`, true);
+    }finally{ const b=$('#chatGo'); if(b) b.disabled = false; }
+  }
+
+  setTab('cards'); renderHist();
 })();
 </script>
 </body>
