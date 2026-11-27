@@ -119,7 +119,7 @@
         <input type="file" id="fileInput" accept=".json,application/json" hidden>
       </div>
       <div class="status" id="walletStatus"></div>
-      <p class="small">The file holds your card and portal <em>names</em> and notes — never card numbers.</p>
+      <p class="small">The file holds your card and portal <em>names</em>, notes and past lookups — never card numbers.</p>
     </section>
 
     <section class="panel">
@@ -214,7 +214,7 @@
     if(d.e!=null){ editing=+d.e; $('#itemName').value=data[tab][editing].name; $('#itemNote').value=data[tab][editing].note||''; $('#itemSubmit').textContent='Save '+KIND[tab].one; $('#itemCancel').hidden=false; $('#itemName').focus(); }
   });
 
-  const fileBody = () => JSON.stringify({ app:'which-card', version:2, saved:new Date().toISOString(), cards:data.cards, portals:data.portals }, null, 2);
+  const fileBody = () => JSON.stringify({ app:'which-card', version:3, saved:new Date().toISOString(), cards:data.cards, portals:data.portals, history }, null, 2);
   async function writeHandle(quiet){
     try{ const w = await fileHandle.createWritable(); await w.write(fileBody()); await w.close(); status('#walletStatus', `${quiet?'Auto-saved':'Saved'} to ${fileHandle.name}`); }
     catch(err){ status('#walletStatus', 'Could not write file: '+err.message, true); }
@@ -238,7 +238,15 @@
       if(!Array.isArray(cards)) throw new Error('No "cards" list in file');
       data.cards = clean(cards); data.portals = clean(j.portals);
       store.set(LS.cards, data.cards); store.set(LS.portals, data.portals); renderItems();
-      status('#walletStatus', `Loaded ${data.cards.length} card${data.cards.length===1?'':'s'} and ${data.portals.length} portal${data.portals.length===1?'':'s'} from ${name}`);
+      let nh = 0;
+      if(Array.isArray(j.history)){
+        const seen = new Set(history.map(x=>x.url+'|'+x.at));
+        const add = j.history.filter(x=>x && x.result && !seen.has(x.url+'|'+x.at));
+        nh = add.length;
+        history = history.concat(add).sort((a,b)=>(b.at||0)-(a.at||0)).slice(0,HIST_MAX); current = -1;
+        store.set(LS.hist, history); renderHist();
+      }
+      status('#walletStatus', `Loaded ${data.cards.length} card${data.cards.length===1?'':'s'}, ${data.portals.length} portal${data.portals.length===1?'':'s'}${nh?` and ${nh} past lookup${nh===1?'':'s'}`:''} from ${name}`);
     }catch(err){ status('#walletStatus', 'That file isn’t a card list: '+err.message, true); }
   }
   $('#openFile').onclick = async () => {
@@ -365,9 +373,10 @@ ${PLAYBOOK}`;
   const listText = (arr) => arr.map((c,i)=>`${i+1}. ${c.name}${c.note?` — my notes: ${c.note}`:''}`).join('\n');
 
   // ---------- History ----------
+  const HIST_MAX = 50;
   let history = store.get(LS.hist, []);
   let current = -1; // index into history of the analysis on screen
-  function saveHist(){ store.set(LS.hist, history); renderHist(); }
+  function saveHist(){ store.set(LS.hist, history); renderHist(); if(fileHandle) writeHandle(true); }
   function renderHist(){
     const total = history.reduce((s,h)=>s+(h.cost?.usd||0)+(h.chat||[]).reduce((t,c)=>t+(c.cost?.usd||0),0),0);
     $('#history').innerHTML = history.length ? history.map((h,i)=>{
@@ -462,7 +471,7 @@ ${PLAYBOOK}`;
         onStep: m => { const s=$('#step'); if(s) s.textContent = m.length>110 ? m.slice(0,107)+'…' : m; } });
       let result; try{ result = parseJSON(text); }catch(err){ err.cost = cost; throw err; }
       const h = { url, at:Date.now(), model, userMsg, raw:JSON.stringify(result), result, sources, cost, chat:[] };
-      history.unshift(h); history = history.slice(0,15); current = 0; saveHist();
+      history.unshift(h); history = history.slice(0,HIST_MAX); current = 0; saveHist();
       renderResult(h);
     }catch(err){
       const hint = err.status===401 ? ' Check your API key.' : err.status===429 ? ' Rate limited — wait a moment and retry.' : '';
