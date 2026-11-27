@@ -275,8 +275,8 @@
   };
   const SEARCH_COST = 0.01; // $10 per 1,000 searches; web fetch has no extra charge
   const newCost = model => ({ usd:0, tokens:0, searches:0, fetches:0, model });
-  function addUsage(cost, u){
-    let p = PRICES[cost.model] || PRICES['claude-sonnet-5-5'];
+  function addUsage(cost, u, model){
+    let p = PRICES[model || cost.model] || PRICES['claude-sonnet-5-5'];
     const prompt = (u.input_tokens||0) + (u.cache_read_input_tokens||0) + (u.cache_creation_input_tokens||0);
     if(p.big && prompt > 100000) p = p.big;
     const s = u.server_tool_use?.web_search_requests || 0;
@@ -319,7 +319,7 @@ Respond with ONLY a single JSON object (no prose before or after, no markdown fe
   "caveats": [str],
   "assumptions": [str]
 }
-"best_combo.portal" is null if no portal applies or none helps. "steps" is a short ordered how-to (e.g. "Open Rakuten and click through to Best Buy", "Activate the Amex Offer", "Pay with Amex Gold"). "ranking" includes every card the user listed, best first, card-only returns (no portal). "portals" includes every portal the user listed (yours: true) plus at most two better ones they don't have (yours: false), best first. "why" is 2-4 plain-English sentences. Keep each list item to one or two sentences.`;
+"best_combo.portal" is null if no portal applies or none helps. "steps" is a short ordered how-to (e.g. "Open Rakuten and click through to Best Buy", "Activate the Amex Offer", "Pay with Amex Gold"). "ranking" includes every card the user listed, best first, card-only returns (no portal). "portals" includes every portal the user listed (yours: true) plus at most two better ones they don't have (yours: false), best first. "why" is 2-4 plain-English sentences. Keep each list item to one or two sentences. The output must be strictly valid JSON: never put an unescaped double-quote character inside a string value (write inches as "in", e.g. 65-in TV, and use single quotes for quoted phrases), and no trailing commas.`;
 
   const CHAT_SYSTEM = `You are a credit-card rewards and shopping-portal analyst continuing a conversation with the user about a purchase you already analysed (your analysis is the JSON earlier in the conversation). Answer the user's follow-up questions directly and concisely in plain English — short paragraphs or a few bullets, using **bold** sparingly. Do NOT reply in JSON. Use web search if the question needs current facts you don't already have (rates, offers, terms). Respect the user's notes on their cards and portals. If they ask "what if" (different card, portal, store, price), recompute and give the new numbers.
 
@@ -370,6 +370,15 @@ ${PLAYBOOK}`;
     if(a<0||b<0) throw new Error('The model didn’t return a structured answer. Try again');
     return JSON.parse(s.slice(a,b+1));
   }
+  // If the research answer has a JSON syntax error, ask Haiku (cheap, no tools) to fix the syntax only.
+  async function repairJSON(text, key, cost){
+    const model = 'claude-haiku-5-5';
+    const resp = await callClaude({ model, max_tokens:16000,
+      system:'You fix JSON syntax. Return the user\u2019s content as one strictly valid JSON object with the same keys and values. Only fix syntax: escape stray double quotes inside strings, add missing commas or brackets, remove trailing commas, drop any text outside the object. Output the JSON only, no fences.',
+      messages:[{ role:'user', content:text }] }, key);
+    if(resp.usage) addUsage(cost, resp.usage, model);
+    return parseJSON((resp.content||[]).filter(b=>b.type==='text').map(b=>b.text).join(''));
+  }
   const listText = (arr) => arr.map((c,i)=>`${i+1}. ${c.name}${c.note?` — my notes: ${c.note}`:''}`).join('\n');
 
   // ---------- History ----------
@@ -406,6 +415,15 @@ ${PLAYBOOK}`;
   }
 
   function renderResult(h){
+    if(h.result && h.result._raw){
+      $('#result').innerHTML = `<div class="product"><div><div class="pname">${esc(h.url)}</div><div class="small"><span class="pill warn">shown as text</span> The answer couldn\u2019t be laid out as a table, so here it is as written.</div></div></div>
+        <div class="msg a" style="max-width:none">${md(h.result._raw.replace(/[{}\[\]]/g,'').replace(/^\s*"?(\w+)"?\s*:/gm,'$1:'))}</div>
+        ${h.cost?`<p class="small" style="margin-top:16px"><b>This lookup cost about</b> ${costLine(h.cost)}</p>`:''}
+        <div id="chat"><h3>Ask a follow-up</h3><div id="thread"></div><form class="chatbox" id="chatForm"><textarea id="chatQ" rows="2" placeholder="e.g. Just tell me the best portal and card in one line"></textarea><button class="primary" id="chatGo" type="submit">Ask</button></form><div class="status" id="chatStatus"></div></div>`;
+      renderThread(h);
+      $('#chatForm').addEventListener('submit', e => { e.preventDefault(); askFollowUp(); });
+      return;
+    }
     const r = h.result, p = r.product||{}, conf = p.category_confidence, old = r.recommendation || {};
     const bc = r.best_combo || { card:old.card, total_return_pct:old.effective_return_pct, total_return_usd:old.effective_return_usd, headline:old.headline, why:old.rationale };
     const combo = bc.portal ? `${esc(bc.portal)}<span class="plus">+</span>${esc(bc.card)}` : esc(bc.card);
@@ -467,10 +485,16 @@ ${PLAYBOOK}`;
     $('#go').disabled = true; status('#askStatus','');
     $('#result').innerHTML = `<div class="empty"><span class="spinner"></span><span id="step">Researching the product, your cards and portal rates…</span><div class="small" style="margin-top:8px">Usually 30–120 seconds.</div></div>`;
     try{
-      const { text, sources, cost } = await runTurn({ key, model, system:SYSTEM, messages:[{ role:'user', content:userMsg }], searches:15, fetches:5, maxTokens:10000,
+      const { text, sources, cost } = await runTurn({ key, model, system:SYSTEM, messages:[{ role:'user', content:userMsg }], searches:15, fetches:5, maxTokens:16000,
         onStep: m => { const s=$('#step'); if(s) s.textContent = m.length>110 ? m.slice(0,107)+'…' : m; } });
-      let result; try{ result = parseJSON(text); }catch(err){ err.cost = cost; throw err; }
-      const h = { url, at:Date.now(), model, userMsg, raw:JSON.stringify(result), result, sources, cost, chat:[] };
+      let result;
+      try{ result = parseJSON(text); }
+      catch(e1){
+        const s=$('#step'); if(s) s.textContent = 'Fixing the answer\u2019s formatting…';
+        try{ result = await repairJSON(text, key, cost); }
+        catch(e2){ result = { product:{ name:url }, _raw:text }; } // show the answer as text rather than lose it
+      }
+      const h = { url, at:Date.now(), model, userMsg, raw: result._raw ? text : JSON.stringify(result), result, sources, cost, chat:[] };
       history.unshift(h); history = history.slice(0,HIST_MAX); current = 0; saveHist();
       renderResult(h);
     }catch(err){
